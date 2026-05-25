@@ -26,7 +26,8 @@ public class SlopController {
                     defaultValue = "extreme") String modernizationLevel) {
 
 
-        return "200";
+        return service.generate(originalTweet, topicHint, emojiLevel, modernizationLevel);
+
     }
 }
 
