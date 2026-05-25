@@ -3,6 +3,7 @@ package slop_generator.poc.service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.ai.chat.prompt.PromptTemplate;
 import org.springframework.stereotype.Service;
 import slop_generator.poc.constants.SlopConstants;
@@ -14,9 +15,12 @@ public class SlopService {
 
     private final ChatClient chatClient;
     private static final Logger LOG = LoggerFactory.getLogger(SlopService.class);
+    private static final ChatOptions options = ChatOptions.builder().model("gpt-5.2").temperature(.99)
+            .topP(.95)
+            .build();
 
     public SlopService(ChatClient.Builder builder) {
-        this.chatClient = builder.build();
+        this.chatClient = builder.defaultOptions(options.mutate()).build();
     }
 
 

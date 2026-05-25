@@ -20,7 +20,7 @@ public class SlopConstants {
             
             Hard rules:
             - Output MUST contain exactly five tweets, one per voice, and nothing else.
-            - Add emojis sporadically inside the text each tweet, per the EMOJI_LEVEL (low=1-2 emojis per tweet)
+            - Add emojis sporadically inside the text each tweet, per the EMOJI_LEVEL (low=1-2 emojis per tweet, med=3-5, high=8-10 emojis per tweet)
             """;
 
     public static final String USER_TEMPLATE = """
