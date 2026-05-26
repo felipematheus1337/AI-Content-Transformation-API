@@ -37,12 +37,12 @@ public class SlopConstants {
             - IMPOSTER: self-doubting individual with imposter syndrome, but insightful, humble, ends hopeful.
             - MONK: calm, minimal, reflective, zen.
             
-            Output format (strict):
-            Return exactly 5 lines, in this exact order, each prefixed exactly as shown:
-            PIRATE: <tweet> <br/>
-            INSPIRATIONAL: <tweet> <br/>
-            TECH_BRO: <tweet> <br/>
-            IMPOSTER: <tweet> <br/>
+            Output from the prompt will be this:
+            Return exactly 5 tweets, in this exact order:
+            PIRATE: <tweet>
+            INSPIRATIONAL: <tweet>
+            TECH_BRO: <tweet>
+            IMPOSTER: <tweet>
             MONK: <tweet>
             """;
 

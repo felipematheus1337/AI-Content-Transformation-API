@@ -5,8 +5,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.ai.chat.prompt.PromptTemplate;
+import org.springframework.ai.converter.BeanOutputConverter;
 import org.springframework.stereotype.Service;
 import slop_generator.poc.constants.SlopConstants;
+import slop_generator.poc.dto.NewTweets;
 
 import java.util.Map;
 
@@ -20,11 +22,14 @@ public class SlopService {
             .build();
 
     public SlopService(ChatClient.Builder builder) {
-        this.chatClient = builder.defaultOptions(options.mutate()).build();
+        this.chatClient = builder
+                .defaultSystem(SlopConstants.SYSTEM_TEMPLATE)
+                .defaultOptions(options.mutate())
+                .build();
     }
 
 
-    public String generate(String originalTweet, String topicHint, String emojiLevel, String modernizationLevel) {
+    public NewTweets generate(String originalTweet, String topicHint, String emojiLevel, String modernizationLevel) {
         LOG.info("Generating slop for originalTweet: {}, topicHint: {}, emojiLevel: {}," +
                         " modernizationLevel: {}",
                 originalTweet, topicHint, emojiLevel, modernizationLevel);
@@ -32,12 +37,13 @@ public class SlopService {
         PromptTemplate promptTemplate = new PromptTemplate(SlopConstants.USER_TEMPLATE);
         var userPrompt = createUserPrompt(promptTemplate, originalTweet, topicHint, emojiLevel, modernizationLevel);
 
+        BeanOutputConverter<NewTweets> converter = new BeanOutputConverter<>(NewTweets.class);
+
         return chatClient
                 .prompt()
-                .system(SlopConstants.SYSTEM_TEMPLATE)
                 .user(userPrompt)
                 .call()
-                .content();
+                .entity(converter);
 
     }
 

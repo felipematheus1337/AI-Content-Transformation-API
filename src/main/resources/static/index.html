@@ -1,0 +1,990 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>✨ Tweet Converter - Transform Your Tweets ✨</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #ff69b4;
+            --secondary: #ff1493;
+            --accent: #ffd700;
+            --light-bg: #fff5f8;
+            --dark-text: #2d2d2d;
+            --shadow: 0 8px 32px rgba(255, 105, 180, 0.25);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #fff5f8 0%, #ffe4f0 50%, #fff0f7 100%);
+            color: var(--dark-text);
+            min-height: 100vh;
+            overflow-x: hidden;
+            animation: bgPulse 8s ease-in-out infinite;
+        }
+
+        @keyframes bgPulse {
+            0%, 100% { filter: brightness(1); }
+            50% { filter: brightness(1.05); }
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 20px;
+            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            grid-column: 1 / -1;
+            text-align: center;
+            animation: slideDown 0.8s ease-out;
+        }
+
+        h1 {
+            font-size: 3em;
+            background: linear-gradient(135deg, #ff69b4, #ff1493, #ffd700);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+            text-shadow: 0 0 30px rgba(255, 105, 180, 0.1);
+            animation: textGlow 3s ease-in-out infinite;
+        }
+
+        .subtitle {
+            font-size: 1.1em;
+            color: #ff69b4;
+            font-style: italic;
+            animation: fadeInOut 3s ease-in-out infinite;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes textGlow {
+            0%, 100% { filter: drop-shadow(0 0 5px rgba(255, 105, 180, 0.3)); }
+            50% { filter: drop-shadow(0 0 15px rgba(255, 105, 180, 0.8)); }
+        }
+
+        @keyframes fadeInOut {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+
+        /* Sidebar */
+        .sidebar {
+            animation: slideInLeft 0.8s ease-out;
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: var(--shadow);
+            height: fit-content;
+            position: sticky;
+            top: 20px;
+        }
+
+        .sidebar h2 {
+            color: var(--primary);
+            margin-bottom: 20px;
+            font-size: 1.3em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sidebar h2::before {
+            content: "📝";
+            animation: spin 3s linear infinite;
+        }
+
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .history-list {
+            max-height: 600px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .history-item {
+            padding: 12px;
+            background: linear-gradient(135deg, #fff5f8, #ffe4f0);
+            border: 2px solid var(--primary);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            animation: popIn 0.5s ease-out;
+        }
+
+        @keyframes popIn {
+            0% {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .history-item:hover {
+            transform: translateX(10px) scale(1.05);
+            box-shadow: 0 8px 20px rgba(255, 105, 180, 0.4);
+            background: linear-gradient(135deg, #ffe4f0, #ffb6d9);
+        }
+
+        .history-item.active {
+            background: linear-gradient(135deg, #ff69b4, #ff1493);
+            color: white;
+            border-color: var(--secondary);
+            animation: jiggle 0.5s ease-in-out;
+        }
+
+        @keyframes jiggle {
+            0%, 100% { transform: rotateZ(0deg); }
+            25% { transform: rotateZ(-2deg); }
+            75% { transform: rotateZ(2deg); }
+        }
+
+        .history-item-text {
+            font-size: 0.9em;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-bottom: 5px;
+        }
+
+        .history-item-meta {
+            font-size: 0.75em;
+            opacity: 0.7;
+        }
+
+        .clear-history {
+            width: 100%;
+            padding: 10px;
+            margin-top: 15px;
+            background: linear-gradient(135deg, #ff69b4, #ff1493);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .clear-history:hover {
+            transform: scale(1.05);
+            box-shadow: var(--shadow);
+        }
+
+        .clear-history:active {
+            transform: scale(0.95);
+        }
+
+        /* Main Content */
+        .main-content {
+            animation: slideInRight 0.8s ease-out;
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .form-card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: var(--shadow);
+            margin-bottom: 30px;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+            animation: slideInUp 0.8s ease-out;
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+            color: var(--primary);
+            font-weight: bold;
+            font-size: 1.05em;
+        }
+
+        input[type="text"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid var(--primary);
+            border-radius: 10px;
+            font-family: inherit;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            background: rgba(255, 105, 180, 0.05);
+        }
+
+        input[type="text"]:focus,
+        textarea:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--secondary);
+            box-shadow: 0 0 15px rgba(255, 105, 180, 0.3);
+            background: rgba(255, 105, 180, 0.1);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        button {
+            flex: 1;
+            padding: 15px;
+            font-size: 1.1em;
+            font-weight: bold;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-convert {
+            background: linear-gradient(135deg, #ff69b4, #ff1493);
+            color: white;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(255, 105, 180, 0.7); }
+            50% { box-shadow: 0 0 0 10px rgba(255, 105, 180, 0); }
+        }
+
+        .btn-convert:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(255, 105, 180, 0.4);
+        }
+
+        .btn-convert:active {
+            transform: translateY(-1px);
+        }
+
+        .btn-convert:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            animation: none;
+        }
+
+        .btn-reset {
+            background: linear-gradient(135deg, #ddd, #aaa);
+            color: white;
+        }
+
+        .btn-reset:hover {
+            transform: scale(1.05);
+        }
+
+        /* Results */
+        .results-card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: var(--shadow);
+            animation: scaleIn 0.6s ease-out;
+        }
+
+        @keyframes scaleIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .results-card h3 {
+            color: var(--primary);
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            animation: slideInLeft 0.6s ease-out;
+        }
+
+        .tweet-variants {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .tweet-variant {
+            background: linear-gradient(135deg, #fff5f8, #ffe4f0);
+            border: 2px solid var(--accent);
+            border-radius: 15px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            animation: bounceIn 0.6s ease-out;
+        }
+
+        @keyframes bounceIn {
+            0% {
+                opacity: 0;
+                transform: scale(0.3);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .tweet-variant:hover {
+            transform: translateY(-10px) rotateZ(2deg);
+            box-shadow: 0 15px 40px rgba(255, 215, 0, 0.3);
+            background: linear-gradient(135deg, #ffe4f0, #ffcceb);
+        }
+
+        .tweet-variant-text {
+            font-size: 0.95em;
+            margin-bottom: 15px;
+            line-height: 1.6;
+            word-break: break-word;
+        }
+
+        .tweet-variant-meta {
+            font-size: 0.8em;
+            color: #666;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            background: var(--accent);
+            color: var(--dark-text);
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: bold;
+        }
+
+        /* Loading Spinner */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.3);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            backdrop-filter: blur(5px);
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .loading-overlay.active {
+            display: flex;
+        }
+
+        .spinner {
+            width: 80px;
+            height: 80px;
+            position: relative;
+        }
+
+        .spinner::before,
+        .spinner::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border: 4px solid transparent;
+            border-radius: 50%;
+            animation: spin 1.5s linear infinite;
+        }
+
+        .spinner::before {
+            border-top-color: #ff69b4;
+            border-right-color: #ff69b4;
+            animation-direction: clockwise;
+        }
+
+        .spinner::after {
+            border-bottom-color: #ff1493;
+            border-left-color: #ff1493;
+            animation-direction: counter-clockwise;
+            animation-duration: 2s;
+            width: 70%;
+            height: 70%;
+            top: 5px;
+            left: 5px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            position: absolute;
+            text-align: center;
+            width: 200px;
+            color: white;
+            font-weight: bold;
+            animation: bob 1s ease-in-out infinite;
+        }
+
+        @keyframes bob {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+
+        .loading-dots {
+            display: inline-block;
+            width: 20px;
+            text-align: left;
+        }
+
+        .loading-dots::after {
+            content: '...';
+            animation: dots 1.5s steps(4, end) infinite;
+        }
+
+        @keyframes dots {
+            0%, 20% { content: '.'; }
+            40% { content: '..'; }
+            60% { content: '...'; }
+            80%, 100% { content: ''; }
+        }
+
+        /* Fireworks */
+        .firework {
+            position: fixed;
+            pointer-events: none;
+        }
+
+        .particle {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            animation: explode 0.8s ease-out forwards;
+        }
+
+        @keyframes explode {
+            0% {
+                opacity: 1;
+                transform: translate(0, 0) scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: translate(var(--tx), var(--ty))) scale(0);
+            }
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        .empty-state-icon {
+            font-size: 4em;
+            margin-bottom: 20px;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .empty-state p {
+            font-size: 1.2em;
+            margin-bottom: 10px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+                padding: 15px;
+            }
+
+            .sidebar {
+                position: static;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            h1 {
+                font-size: 2em;
+            }
+
+            .tweet-variants {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Scrollbar */
+        .history-list::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .history-list::-webkit-scrollbar-track {
+            background: rgba(255, 105, 180, 0.1);
+            border-radius: 10px;
+        }
+
+        .history-list::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, #ff69b4, #ff1493);
+            border-radius: 10px;
+        }
+
+        .history-list::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(180deg, #ff1493, #ff69b4);
+        }
+    </style>
+</head>
+<body>
+    <div class="loading-overlay" id="loadingOverlay">
+        <div style="position: relative;">
+            <div class="spinner"></div>
+            <div class="loading-text">
+                Transforming<span class="loading-dots"></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <header>
+            <h1>✨ Tweet Converter ✨</h1>
+            <p class="subtitle">Transform your tweets into creative variations!</p>
+        </header>
+
+        <div class="sidebar">
+            <h2>Tweet History</h2>
+            <div class="history-list" id="historyList">
+                <div class="empty-state-icon">📚</div>
+                <p style="font-size: 0.9em; color: #999;">No history yet</p>
+            </div>
+            <button class="clear-history" id="clearHistory">CLEAR HISTORY</button>
+        </div>
+
+        <div class="main-content">
+            <div class="form-card">
+                <form id="tweetForm">
+                    <div class="form-group">
+                        <label for="originalTweet">Original Tweet</label>
+                        <textarea id="originalTweet" placeholder="Enter your tweet here..." required></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="topicHint">Topic Hint (Optional)</label>
+                        <input type="text" id="topicHint" placeholder="e.g., tech, sports, memes...">
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="emojiLevel">Emoji Level</label>
+                            <select id="emojiLevel" required>
+                                <option value="">-- Select Level --</option>
+                                <option value="low">🟢 Low</option>
+                                <option value="medium">🟡 Medium</option>
+                                <option value="high">🔴 High</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="modernizationLevel">Modernization Level</label>
+                            <select id="modernizationLevel" required>
+                                <option value="">-- Select Level --</option>
+                                <option value="low">📖 Low</option>
+                                <option value="medium">💻 Medium</option>
+                                <option value="extreme">🚀 Extreme</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="button-group">
+                        <button type="submit" class="btn-convert">✨ Convert Tweet ✨</button>
+                        <button type="reset" class="btn-reset">Clear Form</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="results-card" id="resultsCard" style="display: none;">
+                <h3>🎉 Tweet Variants</h3>
+                <div class="tweet-variants" id="tweetsContainer"></div>
+            </div>
+
+            <div class="empty-state" id="emptyState">
+                <div class="empty-state-icon">🐦</div>
+                <p>Enter a tweet and click "Convert Tweet" to get started!</p>
+                <p style="font-size: 0.9em;">Your variants will appear here...</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // State Management
+        const state = {
+            history: [],
+            lastGenerated: null,
+        };
+
+        // DOM Elements
+        const form = document.getElementById('tweetForm');
+        const originalTweetInput = document.getElementById('originalTweet');
+        const topicHintInput = document.getElementById('topicHint');
+        const emojiLevelSelect = document.getElementById('emojiLevel');
+        const modernizationLevelSelect = document.getElementById('modernizationLevel');
+        const historyList = document.getElementById('historyList');
+        const clearHistoryBtn = document.getElementById('clearHistory');
+        const resultsCard = document.getElementById('resultsCard');
+        const tweetsContainer = document.getElementById('tweetsContainer');
+        const emptyState = document.getElementById('emptyState');
+        const loadingOverlay = document.getElementById('loadingOverlay');
+
+        // Initialize
+        loadHistoryFromStorage();
+
+        // Event Listeners
+        form.addEventListener('submit', handleConvert);
+        clearHistoryBtn.addEventListener('click', clearHistory);
+
+        async function handleConvert(e) {
+            e.preventDefault();
+
+            const originalTweet = originalTweetInput.value.trim();
+            const topicHint = topicHintInput.value.trim() || 'general';
+            const emojiLevel = emojiLevelSelect.value;
+            const modernizationLevel = modernizationLevelSelect.value;
+
+            if (!originalTweet || !emojiLevel || !modernizationLevel) {
+                alert('Please fill in all required fields!');
+                return;
+            }
+
+            showLoading();
+            triggerFireworks();
+
+            try {
+                const response = await fetch('/api/tweets', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        originalTweet,
+                        topicHint,
+                        emojiLevel,
+                        modernizationLevel,
+                    }),
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to convert tweet');
+                }
+
+                const data = await response.json();
+
+                // Save to history
+                const historyEntry = {
+                    id: Date.now(),
+                    originalTweet,
+                    topicHint,
+                    emojiLevel,
+                    modernizationLevel,
+                    variants: data.variants || [],
+                    timestamp: new Date().toLocaleString(),
+                };
+
+                state.history.unshift(historyEntry);
+                state.lastGenerated = historyEntry;
+                saveHistoryToStorage();
+                updateHistoryUI();
+                displayResults(historyEntry);
+
+                triggerSubtleAnimations();
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error converting tweet. Please try again.');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        function displayResults(historyEntry) {
+            emptyState.style.display = 'none';
+            resultsCard.style.display = 'block';
+            tweetsContainer.innerHTML = '';
+
+            const variants = historyEntry.variants || [];
+            if (variants.length === 0) {
+                tweetsContainer.innerHTML = '<p>No variants generated</p>';
+                return;
+            }
+
+            variants.forEach((variant, index) => {
+                const variantEl = document.createElement('div');
+                variantEl.className = 'tweet-variant';
+                variantEl.style.animationDelay = `${index * 0.1}s`;
+                variantEl.innerHTML = `
+                    <div class="tweet-variant-text">${escapeHtml(variant.text)}</div>
+                    <div class="tweet-variant-meta">
+                        <span class="badge">Voice: ${escapeHtml(variant.voice || 'n/a')}</span>
+                        <span class="badge">Score: ${(variant.score || 0).toFixed(2)}</span>
+                    </div>
+                `;
+                variantEl.addEventListener('click', () => copyToClipboard(variant.text));
+                tweetsContainer.appendChild(variantEl);
+            });
+        }
+
+        function updateHistoryUI() {
+            historyList.innerHTML = '';
+
+            if (state.history.length === 0) {
+                historyList.innerHTML = '<div class="empty-state-icon">📚</div><p style="font-size: 0.9em; color: #999;">No history yet</p>';
+                return;
+            }
+
+            state.history.forEach((entry) => {
+                const historyItem = document.createElement('div');
+                historyItem.className = 'history-item';
+                if (state.lastGenerated?.id === entry.id) {
+                    historyItem.classList.add('active');
+                }
+                historyItem.innerHTML = `
+                    <div class="history-item-text">${escapeHtml(entry.originalTweet)}</div>
+                    <div class="history-item-meta">
+                        📱 ${entry.variants?.length || 0} variants • ${entry.timestamp}
+                    </div>
+                `;
+                historyItem.addEventListener('click', () => {
+                    state.lastGenerated = entry;
+                    updateHistoryUI();
+                    displayResults(entry);
+                });
+                historyList.appendChild(historyItem);
+            });
+        }
+
+        function clearHistory() {
+            if (confirm('Are you sure you want to clear all history?')) {
+                state.history = [];
+                state.lastGenerated = null;
+                saveHistoryToStorage();
+                updateHistoryUI();
+                emptyState.style.display = 'block';
+                resultsCard.style.display = 'none';
+            }
+        }
+
+        function saveHistoryToStorage() {
+            localStorage.setItem('tweetHistory', JSON.stringify(state.history));
+        }
+
+        function loadHistoryFromStorage() {
+            const stored = localStorage.getItem('tweetHistory');
+            if (stored) {
+                state.history = JSON.parse(stored);
+                updateHistoryUI();
+            }
+        }
+
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                alert('Tweet copied to clipboard! 📋');
+                triggerConfetti();
+            }).catch(() => {
+                alert('Failed to copy');
+            });
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function showLoading() {
+            loadingOverlay.classList.add('active');
+        }
+
+        function hideLoading() {
+            loadingOverlay.classList.remove('active');
+        }
+
+        // Animations
+        function triggerFireworks() {
+            for (let i = 0; i < 12; i++) {
+                createFirework(
+                    Math.random() * window.innerWidth,
+                    Math.random() * window.innerHeight * 0.5
+                );
+            }
+        }
+
+        function triggerConfetti() {
+            for (let i = 0; i < 30; i++) {
+                createConfetti(
+                    window.innerWidth / 2,
+                    window.innerHeight / 2
+                );
+            }
+        }
+
+        function triggerSubtleAnimations() {
+            // Random floating hearts
+            for (let i = 0; i < 5; i++) {
+                setTimeout(() => {
+                    createFloatingHeart();
+                }, i * 100);
+            }
+        }
+
+        function createFirework(x, y) {
+            const colors = ['#ff69b4', '#ff1493', '#ffd700', '#00ffff', '#ff00ff'];
+            const particleCount = 30;
+
+            for (let i = 0; i < particleCount; i++) {
+                const angle = (i / particleCount) * Math.PI * 2;
+                const velocity = 3 + Math.random() * 4;
+                const tx = Math.cos(angle) * velocity * 100;
+                const ty = Math.sin(angle) * velocity * 100;
+
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = x + 'px';
+                particle.style.top = y + 'px';
+                particle.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                particle.style.setProperty('--tx', tx + 'px');
+                particle.style.setProperty('--ty', ty + 'px');
+                document.body.appendChild(particle);
+
+                setTimeout(() => particle.remove(), 800);
+            }
+        }
+
+        function createConfetti(x, y) {
+            const colors = ['#ff69b4', '#ffd700', '#00ffff', '#ff1493'];
+            const confetti = document.createElement('div');
+            confetti.style.position = 'fixed';
+            confetti.style.left = x + 'px';
+            confetti.style.top = y + 'px';
+            confetti.style.width = '10px';
+            confetti.style.height = '10px';
+            confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+            confetti.style.borderRadius = Math.random() > 0.5 ? '50%' : '0%';
+            confetti.style.pointerEvents = 'none';
+            confetti.style.animation = `explode 1s ease-out forwards`;
+            confetti.style.setProperty('--tx', (Math.random() - 0.5) * 200 + 'px');
+            confetti.style.setProperty('--ty', -Math.random() * 300 + 'px');
+            document.body.appendChild(confetti);
+
+            setTimeout(() => confetti.remove(), 1000);
+        }
+
+        function createFloatingHeart() {
+            const heart = document.createElement('div');
+            heart.textContent = '💕';
+            heart.style.position = 'fixed';
+            heart.style.left = Math.random() * window.innerWidth + 'px';
+            heart.style.top = window.innerHeight - 20 + 'px';
+            heart.style.fontSize = '30px';
+            heart.style.pointerEvents = 'none';
+            heart.style.animation = 'float 3s ease-in forwards';
+            heart.style.opacity = '0.7';
+            document.body.appendChild(heart);
+
+            setTimeout(() => heart.remove(), 3000);
+        }
+
+        // Make floating hearts continuously appear
+        setInterval(() => {
+            if (Math.random() < 0.1) {
+                createFloatingHeart();
+            }
+        }, 500);
+    </script>
+</body>
+</html>
+
